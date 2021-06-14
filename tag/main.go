@@ -177,8 +177,8 @@ func getTags(dimage *DockerImage, regex string) ([]*version.Version, error) {
 }
 
 func getArtifacts(dimage *DockerImage) ([]Artifact, error) {
+	var artifacts = []Artifact{}
 	q := map[string]string{}
-	q["page"] = "1"
 	q["page_size"] = "100"
 	q["with_tag"] = "true"
 	url := fmt.Sprintf("%s/api/v2.0/projects/%s/repositories/%s/artifacts",
@@ -186,16 +186,22 @@ func getArtifacts(dimage *DockerImage) ([]Artifact, error) {
 		dimage.Project,
 		dimage.Repository)
 
-	resp, err := doGet(url, q, dimage.Username, dimage.Password)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
+	for page, n := 1, 0; page == 1 || n == 100; page++ {
+		q["page"] = strconv.Itoa(page)
+		resp, err := doGet(url, q, dimage.Username, dimage.Password)
+		if err != nil {
+			return nil, err
+		}
+		defer resp.Body.Close()
 
-	var artifacts []Artifact
-	err = json.NewDecoder(resp.Body).Decode(&artifacts)
-	if err != nil {
-		return nil, err
+		artifacts_page := []Artifact{}
+		err = json.NewDecoder(resp.Body).Decode(&artifacts_page)
+		if err != nil {
+			return nil, err
+		}
+		n = len(artifacts_page)
+
+		artifacts = append(artifacts, artifacts_page...)
 	}
 
 	return artifacts, nil
