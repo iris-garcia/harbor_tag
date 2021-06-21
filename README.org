@@ -1,0 +1,41 @@
+#+TITLE: Harbor Tag
+
+* Description
+~harbor_tag~ gives the current and/or the next ~semver~ tag for a given
+Harbor registry repository.
+
+It allows the usage of environments with the following format:
+
+|-------------+--------------------------------------+--------------|
+| Environment | Regex                                | Example      |
+|-------------+--------------------------------------+--------------|
+| ~dev~         | ~^v[0-9]+\.[0-9]+.[0-9]+-dev\.[0-9]+$~ | ~v1.0.1.dev.8~ |
+| ~staging~     | ~v[0-9]+\.[0-9]+.[0-9]+-rc\.[0-9]+$~   | ~v2.2.0.rc.10~ |
+| ~prod~        | ~v[0-9]+\.[0-9]+.[0-9]+$~              | ~v3.0.5~       |
+|-------------+--------------------------------------+--------------|
+
+
+* Install
+#+begin_src sh
+  go build .
+#+end_src
+
+* Usage
+#+begin_src sh
+  $ ./harbor_tag next --help
+  Based on the current tags of the image and the input from the user, generates the next tag
+
+  Usage:
+    harbor_tag next [flags]
+
+  Flags:
+        --debug                Debug
+    -e, --environment string   Envrionment [dev, staging, prod]
+    -h, --help                 help for next
+    -p, --password string      Password to authenticate in the registry
+        --project string       Harbor project
+    -r, --registry string      Harbor registry
+        --repository string    Harbor repository
+    -t, --type string          Tag type [major, minor, patch, rc, dev]
+    -u, --username string      Username to authenticate in the registry
+#+end_src
